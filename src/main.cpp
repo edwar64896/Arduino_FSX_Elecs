@@ -1,11 +1,6 @@
 
 #include <Arduino.h>
-/*
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>  // Include core graphics library for the display
-#include <Adafruit_SSD1306.h>  // Include Adafruit_SSD1306 library to drive the display
-*/
+
 
 #include <U8x8lib.h>
 #include <gspswitch.h>
@@ -19,6 +14,8 @@
 #define MODE_APU      6
 
 U8X8_SSD1306_128X64_NONAME_HW_I2C display;
+
+#define USEFONT u8x8_font_8x13_1x2_f 
 
 int active = 0;
 
@@ -34,74 +31,87 @@ gspSwitch  swGen1(MODE_GEN1,setModeGen1,1);
 gspSwitch  swGen2(MODE_GEN2,setModeGen2,1);
 gspSwitch  swApu(MODE_APU,setModeApu,1);
 
+#define R1   0
+#define R2   6
+#define R1_1 6
+#define R2_1 6
+
+char * szbuf=new char[50];
+
+char * szPad(char * szValue) {
+  sprintf(szbuf,"%s   ",szValue);
+  return szbuf;
+}
+
 void display_bAmps(char* szValue) {
+
   if (active==MODE_BATT) {
-    display.drawString(6,0,"      ");
-    display.drawString(6,0,szValue);
+    display.drawString(R1_1,R1,"      ");
+    display.drawString(R1_1,R1,szPad(szValue+1));
   }
 }
 
 void display_bVolts(char* szValue) {
-  Serial.println(szValue);
   if (active==MODE_BATT) {
-    display.drawString(6,6,"      ");
-    display.drawString(6,6,szValue);
+    display.drawString(R2_1,R2,"      ");
+    display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_mbAmps(char* szValue) {
   if (active==MODE_MAINBUS) {
-    display.drawString(6,0,"      ");
-    display.drawString(6,0,szValue);
+    display.drawString(R1_1,R1,"      ");
+    display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_mbVolts(char* szValue) {
   if (active==MODE_MAINBUS) {
-    display.drawString(6,6,"      ");
-    display.drawString(6,6,szValue);
+    display.drawString(R2_1,R2,"      ");
+    display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_g1Amps(char* szValue) {
   if (active==MODE_GEN1) {
-    display.drawString(6,0,"      ");
-    display.drawString(6,0,szValue);
+    display.drawString(R1_1,R1,"      ");
+    display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_g1Volts(char* szValue) {
   if (active==MODE_GEN1) {
-    display.drawString(6,6,"      ");
-    display.drawString(6,6,szValue);
+    display.drawString(R2_1,R2,"      ");
+    display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_g2Amps(char* szValue) {
   if (active==MODE_GEN2) {
-    display.drawString(6,0,"      ");
-    display.drawString(6,0,szValue);
+    display.drawString(R1_1,R1,"      ");
+    display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_g2Volts(char* szValue) {
   if (active==MODE_GEN2) {
-    display.drawString(6,6,"      ");
-    display.drawString(6,6,szValue);
+    display.drawString(R2_1,R2,"      ");
+    display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_aVolts(char* szValue) {
   if (active==MODE_APU) {
-    display.drawString(6,6,"      ");
-    display.drawString(6,6,szValue);
+    display.drawString(R1_1,R1,"      ");
+    display.drawString(R1_1,R1,szPad(szValue));
+    display.drawString(R2_1,R2,"n/a    ");
   }
 }
 
 gspSerialResponse srbVolts("?I", 4, display_bVolts );
 gspSerialResponse srbAmps("?J", 4, display_bAmps  );
 gspSerialResponse srmbVolts("?K", 4, display_mbVolts);
-gspSerialResponse srmbAmps("?L", 3, display_mbAmps);
+gspSerialResponse srmbAmps("?L", 2, display_mbAmps);
 gspSerialResponse srg1Amps("?l", 4, display_g1Amps);
 gspSerialResponse srg2Amps("?m", 4, display_g2Amps);
 gspSerialResponse srg1Volts("<y", 2, display_g1Volts);
@@ -145,14 +155,14 @@ void setup()  // Start of setup
 
   active=MODE_BATT;
 
-  display.setFont(u8x8_font_8x13B_1x2_r);  // Set a custom font
-  display.drawString(0,0,"AMPs");
-  display.drawString(0,6,"VLTs");
+  display.setFont(USEFONT   );  // Set a custom font
+  display.drawString(0,R1,"AMPs");
+  display.drawString(0,R2,"VLTs");
 
 }  // End of setup
 
 void drawMode(char * szMode) {
-  display.setFont(u8x8_font_8x13B_1x2_r);  // Set a custom font
+  display.setFont(USEFONT  );  // Set a custom font
   display.drawString(1,3,szMode);
 }
 
@@ -194,6 +204,9 @@ void loop()
 {
 
   gspSwitch::checkAll();
+  
+  //display.setFont(USEFONT  );  // Set a custom font
+
   gspSerialResponse::checkAll();
   gspFlash::checkAll();
 
