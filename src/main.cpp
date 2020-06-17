@@ -15,7 +15,9 @@
 
 U8X8_SSD1306_128X64_NONAME_HW_I2C display;
 
-#define USEFONT u8x8_font_8x13_1x2_f 
+#define USEFONT u8x8_font_courB18_2x3_r
+#define USEFONT3 u8x8_font_courB18_2x3_n
+#define USEFONT2 u8x8_font_saikyosansbold8_u 
 
 int active = 0;
 
@@ -32,79 +34,90 @@ gspSwitch  swGen2(MODE_GEN2,setModeGen2,1);
 gspSwitch  swApu(MODE_APU,setModeApu,1);
 
 #define R1   0
-#define R2   6
-#define R1_1 6
-#define R2_1 6
+#define R2   3
+#define R1_1 7
+#define R2_1 7
 
 char * szbuf=new char[50];
 
 char * szPad(char * szValue) {
-  sprintf(szbuf,"%s   ",szValue);
+  sprintf(szbuf,"%s  ",szValue);
+  szbuf[4]=0;
   return szbuf;
 }
 
 void display_bAmps(char* szValue) {
-
+Serial.println("doing amps");
+Serial.println(szValue);
   if (active==MODE_BATT) {
-    display.drawString(R1_1,R1,"      ");
+    display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R1_1,R1,"    ");
     display.drawString(R1_1,R1,szPad(szValue+1));
   }
 }
 
 void display_bVolts(char* szValue) {
   if (active==MODE_BATT) {
-    display.drawString(R2_1,R2,"      ");
+    display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R2_1,R2,"    ");
     display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_mbAmps(char* szValue) {
   if (active==MODE_MAINBUS) {
-    display.drawString(R1_1,R1,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R1_1,R1,"    ");
     display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_mbVolts(char* szValue) {
   if (active==MODE_MAINBUS) {
-    display.drawString(R2_1,R2,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R2_1,R2,"    ");
     display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_g1Amps(char* szValue) {
   if (active==MODE_GEN1) {
-    display.drawString(R1_1,R1,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R1_1,R1,"    ");
     display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_g1Volts(char* szValue) {
   if (active==MODE_GEN1) {
-    display.drawString(R2_1,R2,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R2_1,R2,"    ");
     display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_g2Amps(char* szValue) {
   if (active==MODE_GEN2) {
-    display.drawString(R1_1,R1,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R1_1,R1,"    ");
     display.drawString(R1_1,R1,szPad(szValue));
   }
 }
 
 void display_g2Volts(char* szValue) {
   if (active==MODE_GEN2) {
-    display.drawString(R2_1,R2,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R2_1,R2,"    ");
     display.drawString(R2_1,R2,szPad(szValue));;
   }
 }
 
 void display_aVolts(char* szValue) {
   if (active==MODE_APU) {
-    display.drawString(R1_1,R1,"      ");
+      display.setFont(USEFONT  );  // Set a custom font
+    display.drawString(R1_1,R1,"    ");
     display.drawString(R1_1,R1,szPad(szValue));
-    display.drawString(R2_1,R2,"n/a    ");
+    display.drawString(R2_1,R2,"n/a ");
   }
 }
 
@@ -156,14 +169,17 @@ void setup()  // Start of setup
   active=MODE_BATT;
 
   display.setFont(USEFONT   );  // Set a custom font
-  display.drawString(0,R1,"AMPs");
-  display.drawString(0,R2,"VLTs");
+
+  display.drawString(0,R1,"AMP");
+  display.drawString(0,R2,"VLT");
 
 }  // End of setup
 
 void drawMode(char * szMode) {
-  display.setFont(USEFONT  );  // Set a custom font
-  display.drawString(1,3,szMode);
+  display.setFont(USEFONT2  );  // Set a custom font
+    String s=String(szMode);
+    s.toUpperCase();
+    display.drawString(0,7,s.c_str());
 }
 
 void setModeBatt(){
@@ -204,9 +220,6 @@ void loop()
 {
 
   gspSwitch::checkAll();
-  
-  //display.setFont(USEFONT  );  // Set a custom font
-
   gspSerialResponse::checkAll();
   gspFlash::checkAll();
 
